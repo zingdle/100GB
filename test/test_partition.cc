@@ -58,7 +58,8 @@ TEST_CASE("test split and get_first_unique") {
 
   // split
   Partition p(tmp_file);
-  p.split(parts);
+  p.split();
+  std::vector<word_t> split_words;
   for (int p = 0; p < parts; p++) {
     WordsReader* wr =
         new DeeperWordsReader(tmp_file + std::string(".") + std::to_string(p));
@@ -67,9 +68,65 @@ TEST_CASE("test split and get_first_unique") {
     while (info = wr->get_next_word_info()) {
       MyHash hash_func(0);
       CHECK(hash_func(info.word) % parts == p);
+      split_words.push_back(info.word);
     }
     wr->close();
     delete wr;
+  }
+  std::set<word_t> words_set(words.begin(), words.end());
+  for (auto& word : split_words) {
+    CHECK(words_set.count(word));
+  }
+
+  // get_first_unique
+  auto info = p.get_first_unique();
+  auto word = info.word;
+  auto idx = info.idx;
+  auto s = unique_words(words);
+  CHECK(s.count(word));
+  CHECK(m[word] == idx);
+  for (auto sword : s) {
+    CHECK(m[sword] >= idx);
+  }
+}
+
+TEST_CASE("test multithread") {
+  const char* tmp_file = "/tmp/sample.txt";
+  const int n = 100000;
+  const int parts = 16;
+  std::vector<word_t> words;
+  std::vector<idx_t> idxs;
+  std::unordered_map<word_t, idx_t> m;
+
+  // populate random words and indexs
+  for (int i = 0; i < n; i++) words.push_back(random_string(5));
+  for (int i = 0; i < n; i++) m[words[i]] = i + 1;
+
+  // write words to tmp file
+  std::ofstream out(tmp_file);
+  for (int i = 0; i < n; i++) out << words[i] << " ";
+  out.close();
+
+  // split
+  Partition p(tmp_file, 16, 4);
+  p.split();
+  std::vector<word_t> split_words;
+  for (int p = 0; p < parts; p++) {
+    WordsReader* wr =
+        new DeeperWordsReader(tmp_file + std::string(".") + std::to_string(p));
+    wr->open();
+    word_info_t info;
+    while (info = wr->get_next_word_info()) {
+      MyHash hash_func(0);
+      CHECK(hash_func(info.word) % parts == p);
+      split_words.push_back(info.word);
+    }
+    wr->close();
+    delete wr;
+  }
+  std::set<word_t> words_set(words.begin(), words.end());
+  for (auto& word : split_words) {
+    CHECK(words_set.count(word));
   }
 
   // get_first_unique

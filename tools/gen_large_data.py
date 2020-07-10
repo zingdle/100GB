@@ -7,13 +7,15 @@ import os
 charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 output = "../resource/big.txt"
 GB = 1024 * 1024 * 1024
-N = GB // 8  # 1G / 8B
+N = GB / 2 / 8  # 512M / 8B
+N = int(N)
 
 
-def gen_random(filename, n):
+# write `n` random words with length `word_len` to `filename`
+def gen_random(filename, n, word_len=7):
     with open(filename, "w") as f:
         for _ in range(n):
-            word = "".join([random.choice(charset) for x in range(7)])
+            word = "".join([random.choice(charset) for x in range(word_len)])
             f.write(word + " ")
 
 

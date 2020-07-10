@@ -14,7 +14,6 @@ class WordsWriter {
 
   bool is_open() { return _outfile.is_open(); }
 
-  /* open file */
   void open() {
     if (_outfile.is_open()) {
       return;

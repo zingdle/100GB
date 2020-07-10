@@ -6,21 +6,25 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Threads REQUIRED)
 
 add_executable(main src/main.cc)
 target_include_directories(main PRIVATE src/include)
+target_link_libraries(main PRIVATE Threads::Threads)
 
 add_executable(naive src/naive.cc)
 target_include_directories(naive PRIVATE src/include)
 
-macro(add_test test)
-  add_executable(${test} test/${test}.cc)
+macro(add_unittest test)
+  add_executable(${test} test/test_${test}.cc)
   target_include_directories(${test} PRIVATE src/include)
+  target_link_libraries(${test} PRIVATE Threads::Threads)
+  add_test(${test} ${test})
 endmacro()
 
-add_test(test_words_reader)
-add_test(test_words_writer)
-add_test(test_partition)
+enable_testing()
+add_unittest(words_reader)
+add_unittest(words_writer)
+add_unittest(partition)

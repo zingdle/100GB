@@ -66,7 +66,7 @@ class TopWordsReader : public WordsReader {
 
     _word_info_vec.clear();
     word_t cur_word;
-    while (_infile >> cur_word && _word_info_vec.size() < VEC_SIZE) {
+    while (_word_info_vec.size() < VEC_SIZE && _infile >> cur_word) {
       cur_idx++;
       _word_info_vec.push_back({cur_word, cur_idx});
     }
@@ -99,7 +99,7 @@ class DeeperWordsReader : public WordsReader {
     _word_info_vec.clear();
     word_t cur_word;
     idx_t cur_idx;
-    while (_infile >> cur_word >> cur_idx && _word_info_vec.size() < VEC_SIZE) {
+    while (_word_info_vec.size() < VEC_SIZE && _infile >> cur_word >> cur_idx) {
       _word_info_vec.push_back({cur_word, cur_idx});
     }
     return _word_info_vec;

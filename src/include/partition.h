@@ -102,7 +102,7 @@ class Partition {
   }
 
   /* add unique <word, idx> into this partition */
-  void add_unique(word_info_t info, bool flushable = false) {
+  void add_unique(const word_info_t& info, bool flushable = false) {
     auto word = info.word;
     auto idx = info.idx;
 
@@ -118,7 +118,7 @@ class Partition {
   }
 
   /* add vector of unique <word, idx> into this partition */
-  void add_unique_vec(WordInfoVec info_vec, bool flushable = false) {
+  void add_unique_vec(const WordInfoVec& info_vec, bool flushable = false) {
     for (auto& info : info_vec) {
       add_unique(info);
     }
